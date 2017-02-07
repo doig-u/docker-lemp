@@ -86,9 +86,7 @@ $ docker build . -t yourrepo/yournpm:1
 
 First run:
 ```
-$ docker run -d -p 80:80 -p 3306:3306 -v $(pwd)/code:/var/www/code -v $(pwd)/db:/var/lib/mysql -v $(pwd)/log:/var/log -
-e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword --nam
-e yournpm yourrepo/yournpm:1
+$ docker run -d -p 80:80 -p 3306:3306 -v $(pwd)/code:/var/www/code -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword --name yournpm yourrepo/yournpm:1
 ```
 
 After the first run the MySQL server in the container will be initialized during some time (several seconds) with the testdb.sql dump from ./initdb.
@@ -115,11 +113,10 @@ $ curl localhost
 New Pageview # 8
 ```
 
-You must create new container with other version tag, copy code and db inside, and commit it:
+You must create new container with other version tag, copy code inside, and commit it:
 ```
 $ docker create --name yournpm-prod yourrepo/yournpm:1
 $ docker cp ./code yournpm-prod:/var/www/
-$ docker cp ./mysql yournpm-prod:/var/lib/
 $ docker commit yournpm-prod yourrepo/yournpm:2
 ```
 
