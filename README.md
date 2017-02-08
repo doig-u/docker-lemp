@@ -110,7 +110,7 @@ Pageview # 6
 ```
 
 
-For ex, you change the code and ready for deploy container to production:
+For ex, you change the code and ready to deploy container to production:
 ```
 $ curl localhost
 New Pageview # 8
