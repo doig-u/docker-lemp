@@ -106,8 +106,6 @@ $ curl localhost
 Pageview # 5
 $ curl localhost
 Pageview # 6
-$ curl localhost
-Pageview # 7
 ...
 ```
 
