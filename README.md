@@ -140,7 +140,7 @@ $ docker commit example-prod yourrepo/example:1
 ```
 
 
-Now in `docker images` will be the new image with production tag version 1. Check it:
+The `docker images` command will show the new image with production tag version 1. Check it:
 ```
 $ docker run -d -p 80:80 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword --name example-prod-test yourrepo/example:1
 ...(wait for init db)...
