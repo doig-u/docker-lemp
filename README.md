@@ -10,7 +10,7 @@ Services controlled by Supervisord: https://docs.docker.com/engine/admin/using_s
 
 Almost all defaults for nginx & php-pfm on Ubuntu. Look to Dockerfile & configs for minor changes. MySQL (Percona) configured as here: https://hub.docker.com/_/percona/
 
-Also, all logs are in VOLUME /var/log (/var/logs/nginx etc.) for exclusion it from committing Images and migrations. On a production server you must use a logrotate for these.
+All logs are in VOLUME /var/log (/var/logs/nginx etc.) for exclusion it from committing Images and migrations. On a production server you must use a logrotate for these.
 
 Put (mount or copy) your code in /var/www/code.
 
@@ -160,4 +160,5 @@ Without repo you can `docker export` container with code to a archive, `scp arch
 
 ## TODO:
 
+- Fix logs.
 - Add a logrotate for the logs.
