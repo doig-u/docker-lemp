@@ -61,6 +61,7 @@ mysql> quit;
 Bye
 ```
 
+
 After all, kill & remove container and volumes:
 ```
 $ docker kill npm && docker rm -v npm
@@ -68,7 +69,7 @@ $ docker kill npm && docker rm -v npm
 
 ## Example Workflow
 
-The example is in mine github for doigu/npm in folder ./your-project, clone it.
+The example is in mine github for doigu/npm in folder ./example, clone it.
 
 In your project dir are folders ./etc with your service configs, ./code with your app code, ./initdb with your db init sql script, ./mysql for MySQL db in /var/lib/mysql, ./log for services /var/log.
 
@@ -79,15 +80,18 @@ COPY ./etc/nginx/default.conf /etc/nginx/conf.d/
 COPY ./initdb/* /docker-entrypoint-initdb.d/
 ```
 
-Build with version tag:
+
+Build with "dev" version tag:
 ```
-$ docker build . -t yourrepo/yournpm:1
+$ docker build . -t example:dev
 ```
+
 
 First run:
 ```
-$ docker run -d -p 80:80 -p 3306:3306 -v $(pwd)/code:/var/www/code -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword --name yournpm yourrepo/yournpm:1
+$ docker run -d -p 80:80 -p 3306:3306 -v $(pwd)/code:/var/www/code -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword --name example example:dev
 ```
+
 
 After the first run the MySQL server in the container will be initialized during some time (several seconds) with the testdb.sql dump from ./initdb.
 
@@ -107,32 +111,54 @@ Pageview # 7
 ...
 ```
 
+
 For ex, you change the code and ready for deploy container to production:
 ```
 $ curl localhost
 New Pageview # 8
 ```
 
-You must create new container with other version tag, copy code inside, and commit it:
+
+Make other Dockerfile for the production, with copying the code in a production build:
 ```
-$ docker create --name yournpm-prod yourrepo/yournpm:1
-$ docker cp ./code yournpm-prod:/var/www/
-$ docker commit yournpm-prod yourrepo/yournpm:2
+FROM doigu/npm
+COPY ./etc/nginx/default.conf /etc/nginx/conf.d/
+COPY ./initdb/* /docker-entrypoint-initdb.d/
+COPY ./code /var/www/code/
 ```
 
-Now in `docker images` will be the new image with tag 2. Check it:
+
+When make the build:
 ```
-$ docker kill yournpm && docker rm -v yournpm
-$ docker run -d -p 80:80 -p 3306:3306 --name yournpm yourrepo/yournpm:2
+$ docker build . -f Dockerfile-production -t yourrepo/example:1
+```
+
+
+Another way (method 2), you can create a new container, copy the code in, and commit it:
+```
+$ docker create --name example-prod example:dev
+$ docker cp ./code example-prod:/var/www/
+$ docker commit example-prod yourrepo/example:1
+```
+
+
+Now in `docker images` will be the new image with production tag version 1. Check it:
+```
+$ docker run -d -p 80:80 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword --name example-prod-test yourrepo/example:1
+...(wait for init db)...
 $ curl localhost
-New Pageview # 9
+New Pageview # 5
+...
+$ docker kill example-prod-test && docker rm -v example-prod-test
 ```
 
-For deployment on a production server you can push it in your private repo on `$ docker push yourrepo/yournpm:2` your dev-host and pull\run on the server: `docker run -d -p 80:80 -p 3306:3306 --name yournpm yourrepo/yournpm:2`.
 
-You can use it to migrate from one server to another: `docker commit && docker push` it on the server1 (if code & db is in container after deployment) and `docker run` on the server2.
+For deployment on a production server you can push it in your private repo `$ docker push yourrepo/example:1` on yours dev-host and pull\run on the server: `docker run -d -p 80:80 -p 3306:3306 -v /db/example:/var/lib/mysql --name example yourrepo/example:1`. If your production DB is already initialized in the server folder /db/example, you don't need the env variables `-e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword` in the run. After you make a new version on your dev-host, you can `docker pull` it to the server, stop an old container, run the new, test, remove the old.
 
-Without repo you can `docker export` container with code & db to a archive, `scp archive` to the server and `docker import` there.
+For a migration from one server to another you only need to make copy the DB from /db/example to the server 2, and make there `docker run`.
+
+Without repo you can `docker export` container with code to a archive, `scp archive` to the server and `docker import` there.
+
 
 ## TODO:
 
