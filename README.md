@@ -157,6 +157,8 @@ For a migration from one server to another you only need to make copy the DB fro
 
 Without repo you can `docker export` container with code to a archive, `scp archive` to the server and `docker import` there.
 
+And you can use it as virtual server with migrations capabilities through `docker commit\push\pull`.
+
 
 ## TODO:
 
