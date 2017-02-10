@@ -20,8 +20,8 @@ Exposed ports are http 80, https 443, mysql 3306. On Windows (or OsX) you can ad
 
 Test:
 ```
-$ docker run -d -p 80:80 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpassword --name npm doigu/npm
-$ docker exec -it npm bash
+$ docker run -d -p 80:80 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpassword --name lemp doigu/lemp
+$ docker exec -it lemp bash
 
 # tail /var/log/supervisor/supervisord.log
 2017-02-07 17:03:27,667 WARN Included extra file "/etc/supervisor/conf.d/supervisord.conf" during parsing
@@ -64,18 +64,18 @@ Bye
 
 After all, kill & remove container and volumes:
 ```
-$ docker kill npm && docker rm -v npm
+$ docker kill lemp && docker rm -v lemp
 ```
 
 ## Example Workflow
 
-The example is in mine github for doigu/npm in folder ./example, clone it.
+The example is in mine github for doigu/lemp in folder ./example, clone it.
 
 In your project dir are folders ./etc with your service configs, ./code with your app code, ./initdb with your db init sql script, ./mysql for MySQL db in /var/lib/mysql, ./log for services /var/log.
 
 Dockerfile example:
 ```
-FROM doigu/npm
+FROM doigu/lemp
 COPY ./etc/nginx/default.conf /etc/nginx/conf.d/
 COPY ./initdb/* /docker-entrypoint-initdb.d/
 ```
@@ -119,7 +119,7 @@ New Pageview # 8
 
 Make other Dockerfile for the production, with copying the code in a production build:
 ```
-FROM doigu/npm
+FROM doigu/lemp
 COPY ./etc/nginx/default.conf /etc/nginx/conf.d/
 COPY ./initdb/* /docker-entrypoint-initdb.d/
 COPY ./code /var/www/code/
